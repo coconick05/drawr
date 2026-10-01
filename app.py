@@ -42,8 +42,8 @@ st.write("Ahora dibuja abajo 👇")
 with st.sidebar:
     st.subheader("Acerca de:")
     st.write(
-        "En esta aplicación veremos la capacidad que ahora tiene una máquina "
-        "de interpretar un boceto."
+        "En esta aplicación veremos cómo una máquina puede interpretar "
+        "un boceto y convertirlo en un poema."
     )
 
     st.subheader("Propiedades del Tablero")
@@ -75,24 +75,28 @@ canvas_result = st_canvas(
     key=f"canvas_{canvas_width}_{canvas_height}_{stroke_color}",
 )
 
-# ---------------- API Key y análisis ----------------
+# ---------------- API Key y poema ----------------
 ke = st.text_input("Ingresa tu Clave", type="password")
 api_key = ke
 if api_key:
     os.environ["OPENAI_API_KEY"] = api_key
 
-analyze_button = st.button("Analiza la imagen", type="secondary")
+analyze_button = st.button("Crear poema", type="secondary")
 
 if canvas_result.image_data is not None and api_key and analyze_button:
     client = OpenAI(api_key=api_key)
 
-    with st.spinner("Analizando ..."):
+    with st.spinner("Creando poema ..."):
         input_numpy_array = np.array(canvas_result.image_data)
         input_image = Image.fromarray(input_numpy_array.astype("uint8"), "RGBA")
         input_image.save("img.png")
 
         base64_image = encode_image_to_base64("img.png")
-        prompt_text = "Describe the image in spanish"
+        prompt_text = (
+            "Observa la imagen y escribe un poema corto en español "
+            "(entre 4 y 8 versos) inspirado en lo que ves. "
+            "Responde solo con el poema y un título breve."
+        )
 
         try:
             full_response = ""
